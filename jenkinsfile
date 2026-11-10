@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    stages {
+        stage('cleanup stage') {
+            steps {
+                echo 'pulling code...'
+                // Example build command
+                sh 'rm -rf wordsmith-web'
+            }
+        }
+        stage('checkout stage') {
+            steps {
+                echo 'pulling code...'
+                // Example build command
+                sh 'git clone https://github.com/tatahnoellimnyuy/wordsmith-web.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                // Example build command
+                sh 'docker build -t test-image ./wordsmith-web/'
+            }
+        }
+        stage('push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-creds', 
+                                                 usernameVariable: 'DOCKER_USERNAME', 
+                                                 passwordVariable: 'DOCKER_PASSWORD')]) {
+                echo 'Running tests...'
+                // Example test command
+               sh 'echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin'
+                                                 }
+            }
+        }
+        stage('image scan') {
+            steps {
+                echo 'scanning image...'
+                // Example test command
+               // sh './run-tests.sh'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                // Example deploy command
+                //sh './deploy.sh'
+            }
+        }
+    }
+}
